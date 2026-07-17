@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build and Test Docker App
 
 on:
   push:
@@ -6,13 +6,27 @@ on:
       - main
 
 jobs:
-  docker-build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
         run: |
-          docker build -t devops-lab .
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify Flask installation
+        run: |
+          python -c "import flask; print('Flask installed successfully')"
+
+      - name: Build Docker image
+        run: |
+          docker build -t devops-lab:latest .
